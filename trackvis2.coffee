@@ -25,6 +25,28 @@ WaveformView = (canvas) ->
   ctx = canvas[0].getContext('2d')
   ctx.fillStyle = 'black'
 
+  cursor= $ """
+    <div style="
+      position: relative;
+      height: #{height}px;
+      width: 2px;
+      background-color: blue;">
+    """
+
+  overlay = $ """
+    <div style="
+      position: relative;
+      top: -#{height}px;
+      height: 0px;">
+    """
+
+  overlay.append cursor
+  canvas.after overlay
+
+  canvas.click (e) ->
+    mx = e.pageX-@offsetLeft
+    cursor.css 'left', mx
+
   drawBar: (i,val) ->
     val *= 20
     ctx.fillRect(i,0,1,height*val)
