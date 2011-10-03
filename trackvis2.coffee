@@ -33,6 +33,11 @@ loadFile = (file) ->
     
     play = PlayBuffer audio, buf
     view.onCursor = play.skip
+    
+    setInterval(
+      -> view.moveCursor play.getTime()/buf.duration
+      100
+    )
 
 
 WaveformView = (canvas) ->
@@ -67,11 +72,19 @@ WaveformView = (canvas) ->
     drawBar: (i,val) ->
       val *= 20
       ctx.fillRect(i,0,1,height*val)
+    moveCursor: (pos) ->
+      cursor.css 'left', pos*width
 
 
 PlayBuffer = (audio,buffer) ->
   node = null
+  timeStart = null
+  timeBasis = null
+  
   start = (t) ->
+    timeStart = Date.now()
+    timeBasis = t
+    
     node = audio.createBufferSource()
     node.buffer = buffer
     node.connect audio.destination
@@ -85,6 +98,11 @@ PlayBuffer = (audio,buffer) ->
   skip: (t) ->
     node.noteOff 0
     start(t*buffer.duration)
+  getTime: ->
+    Math.min(
+      (Date.now()-timeStart)/1000 + timeBasis
+      buffer.duration
+    )
 
 
 ProcessAudio =
