@@ -24,9 +24,13 @@ loadFile = (file) ->
   
   loadBuffer = (arr) ->
     audio = new webkitAudioContext()
-    buf = audio.createBuffer(arr,true).getChannelData(0)
+    buf = audio.createBuffer(arr,true)
     
-    ProcessAudio.extract buf, sections, view.drawBar
+    ProcessAudio.extract(
+      buf.getChannelData(0)
+      sections, view.drawBar
+    )
+    PlayBuffer audio, buf
 
 
 WaveformView = (canvas) ->
@@ -61,6 +65,11 @@ WaveformView = (canvas) ->
     ctx.fillRect(i,0,1,height*val)
 
 
+PlayBuffer = (audio,buffer) ->
+  node = audio.createBufferSource()
+  node.buffer = buffer
+  node.connect audio.destination
+  node.noteOn 0
 
 ProcessAudio =
   extract: (buffer, sections, out, done) ->
