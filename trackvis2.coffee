@@ -93,12 +93,15 @@ ProcessAudio =
     i = 0
 
     f = ->
-      pos = i*len
-      out i, ProcessAudio.measure(pos,pos+len, buffer)
-      i++
-      if i >= sections
-        clearInterval int
-        done?()
+      end = i+10
+      while i<end
+        pos = i*len
+        out i, ProcessAudio.measure(pos,pos+len, buffer)
+        i++
+        if i >= sections
+          clearInterval int
+          done?()
+          break
 
     int = setInterval f, 1
 
