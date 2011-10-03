@@ -1,6 +1,10 @@
 
 $ ->
-  canvas = $('#canvas')
+  window.canvas = $('#canvas')
+  loadFile 'src.ogg'
+
+
+loadFile = (file) ->
   status = $('#status')
 
   sections = canvas.attr('width')
@@ -8,7 +12,7 @@ $ ->
   view = WaveformView canvas
 
   req = new XMLHttpRequest()
-  req.open 'GET', 'src.ogg', true
+  req.open 'GET', file, true
   req.responseType = 'arraybuffer'
 
   req.onprogress = (e) ->
