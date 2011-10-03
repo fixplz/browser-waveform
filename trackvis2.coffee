@@ -18,10 +18,15 @@ loadFile = (file) ->
   req.onprogress = (e) ->
    status.text "Loading file #{e.loaded/e.total*100}%"
 
-  req.onload = ->
-    ProcessAudio.extract req.response, sections, view.drawBar
+  req.onload = -> loadBuffer req.response
 
   req.send()
+  
+  loadBuffer = (arr) ->
+    audio = new webkitAudioContext()
+    buf = audio.createBuffer(arr,true).getChannelData(0)
+    
+    ProcessAudio.extract buf, sections, view.drawBar
 
 
 WaveformView = (canvas) ->
@@ -56,17 +61,15 @@ WaveformView = (canvas) ->
     ctx.fillRect(i,0,1,height*val)
 
 
-ProcessAudio =
-  extract: (src, sections, out, done) ->
-    audio = new webkitAudioContext()
-    buf = audio.createBuffer(src,true).getChannelData(0)
 
-    len = Math.floor buf.length/sections
+ProcessAudio =
+  extract: (buffer, sections, out, done) ->
+    len = Math.floor buffer.length/sections
     i = 0
 
     f = ->
       pos = i*len
-      out i, ProcessAudio.measure(pos,pos+len, buf)
+      out i, ProcessAudio.measure(pos,pos+len, buffer)
       i++
       if i >= sections
         clearInterval int
