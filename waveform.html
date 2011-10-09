@@ -3,6 +3,7 @@
 
 <canvas id="canvas" width="400" height="200"></canvas>
 <div id="status"></div>
+<div id="play">play/pause</div>
 
 <style>
 canvas { border: solid 1px black }
@@ -10,7 +11,7 @@ canvas { border: solid 1px black }
 
 <script>
 $(function() {
-  Waveform({
+  var sound = Waveform({
     file: 'src.ogg',
     canvas: $('#canvas'),
     onStatus: function(x) {
@@ -19,6 +20,13 @@ $(function() {
     onReady: function() {
    	   $('#status').text('Done')
     }
+  })
+
+  $('#play').click(function() {
+  	if(sound.playback.isPaused())
+  	  sound.playback.play()
+    else
+      sound.playback.pause();
   })
 })
 </script>

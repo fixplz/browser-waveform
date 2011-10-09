@@ -5,7 +5,8 @@
 
   sections = canvas.attr('width')
 
-  view = WaveformView canvas
+  self =
+    view: WaveformView canvas
 
   req = new XMLHttpRequest()
   req.open 'GET', file, true
@@ -23,18 +24,21 @@
     
     ProcessAudio.extract(
       buf.getChannelData(0)
-      sections, view.drawBar
+      sections, self.view.drawBar
     )
     
-    play = PlayBuffer audio, buf
-    view.onCursor = play.skip
+    self.playback = PlayBuffer audio, buf
+    self.view.onCursor = self.playback.playAt
     
     setInterval(
-      -> view.moveCursor play.getTime()/buf.duration
+      -> self.view.moveCursor self.playback.getTime()/buf.duration
       100
     )
 
     onReady?()
+
+  self
+
 
 @WaveformView = (canvas) ->
   {width,height} = canvas[0]
@@ -74,9 +78,11 @@
 
 @PlayBuffer = (audio,buffer) ->
   node = null
+
   timeStart = null
   timeBasis = null
-  
+  paused = null
+
   start = (t) ->
     timeStart = Date.now()
     timeBasis = t
@@ -91,14 +97,25 @@
   
   start(0)
   
-  skip: (t) ->
-    node.noteOff 0
-    start(t*buffer.duration)
-  getTime: ->
-    Math.min(
-      (Date.now()-timeStart)/1000 + timeBasis
-      buffer.duration
-    )
+  self =
+    play: ->
+      start(paused or 0)
+      paused = null
+    playAt: (t) ->
+      node.noteOff 0
+      start(t*buffer.duration)
+      paused = null
+    getTime: ->
+      paused or
+      Math.min(
+        (Date.now()-timeStart)/1000 + timeBasis
+        buffer.duration
+      )
+    pause: ->
+      node.noteOff 0
+      paused = self.getTime()
+    isPaused: ->
+      paused isnt null
 
 
 @ProcessAudio =
