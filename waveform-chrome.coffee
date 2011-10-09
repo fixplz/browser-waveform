@@ -70,8 +70,8 @@
 
   self =
     drawBar: (i,val) ->
-      val *= 20
-      ctx.fillRect(i,0,1,height*val)
+      h = val*50*height
+      ctx.fillRect(i,height/2-h/2,1,h)
     moveCursor: (pos) ->
       cursor.css 'left', pos*width
 
