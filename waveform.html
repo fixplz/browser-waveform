@@ -4,8 +4,23 @@
 <canvas id="canvas" width="400" height="200"></canvas>
 <div id="status"></div>
 
-<p>Works in Chrome</p>
-
 <style>
 canvas { border: solid 1px black }
 </style>
+
+<script>
+$(function() {
+  Waveform({
+    file: 'src.ogg',
+    canvas: $('#canvas'),
+    onStatus: function(x) {
+      $('#status').text('Loading '+Math.floor(x*100)+'%')
+    },
+    onReady: function() {
+   	   $('#status').text('Done')
+    }
+  })
+})
+</script>
+
+<p>Works in Chrome</p>

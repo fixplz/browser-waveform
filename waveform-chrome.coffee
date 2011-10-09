@@ -1,11 +1,7 @@
 
-$ ->
-  window.canvas = $('#canvas')
-  loadFile 'src.ogg'
-
-
-loadFile = (file) ->
-  status = $('#status')
+@Waveform = ({file, canvas, onStatus,onReady}) ->
+  canvas = $(canvas)
+  status = $(status)
 
   sections = canvas.attr('width')
 
@@ -15,8 +11,7 @@ loadFile = (file) ->
   req.open 'GET', file, true
   req.responseType = 'arraybuffer'
 
-  req.onprogress = (e) ->
-   status.text "Loading file #{e.loaded/e.total*100}%"
+  req.onprogress = (e) -> onStatus?(e.loaded/e.total)
 
   req.onload = -> loadBuffer req.response
 
@@ -39,8 +34,9 @@ loadFile = (file) ->
       100
     )
 
+    onReady?()
 
-WaveformView = (canvas) ->
+@WaveformView = (canvas) ->
   {width,height} = canvas[0]
   ctx = canvas[0].getContext('2d')
   ctx.fillStyle = 'black'
@@ -76,7 +72,7 @@ WaveformView = (canvas) ->
       cursor.css 'left', pos*width
 
 
-PlayBuffer = (audio,buffer) ->
+@PlayBuffer = (audio,buffer) ->
   node = null
   timeStart = null
   timeBasis = null
@@ -105,7 +101,7 @@ PlayBuffer = (audio,buffer) ->
     )
 
 
-ProcessAudio =
+@ProcessAudio =
   extract: (buffer, sections, out, done) ->
     len = Math.floor buffer.length/sections
     i = 0
